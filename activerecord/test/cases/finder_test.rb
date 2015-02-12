@@ -33,6 +33,10 @@ class FinderTest < ActiveRecord::TestCase
     end
   end
 
+  def test_find_by_escapes_passed_in_values
+    assert_nil Topic.find_by_title(hax: true)
+  end
+
   def test_find
     assert_equal(topics(:first).title, Topic.find(1).title)
   end

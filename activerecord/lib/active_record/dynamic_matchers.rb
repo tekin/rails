@@ -79,10 +79,16 @@ module ActiveRecord
         attribute_names.map { |name| "_#{name}" }.join(', ')
       end
 
-      # Given that the parameters starts with `_`, the finder needs to use the
-      # same parameter name.
       def attributes_hash
-        "{" + attribute_names.map { |name| ":#{name} => _#{name}" }.join(',') + "}"
+        "{" + attribute_names.map { |name| ":#{name} => #{value_with_type_cast(name)}" }.join(',') + "}"
+      end
+
+      def value_with_type_cast(name)
+        if model.reflect_on_aggregation(name.to_sym) || model.primary_key == name
+          "_#{name}"
+        else
+          "type_for_attribute('#{name}').type_cast_from_user(_#{name})"
+        end
       end
 
       def finder
